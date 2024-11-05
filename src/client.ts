@@ -5,6 +5,9 @@ import selectSoundAudio from "./assets/select.wav";
 import xAssetUrl from "./assets/x.svg";
 import oAssetUrl from "./assets/o.svg";
 
+// for a more complete physics based example check out
+// the Rune Phaser Tech Demo https://developers.rune.ai/blog/phaser/
+
 // simple example for Phaser and Rune combined
 class TicTacToe extends Phaser.Scene {
   boardPosition = { x: window.innerWidth / 20, y: window.innerHeight / 20 };
