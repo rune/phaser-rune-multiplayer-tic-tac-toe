@@ -5,7 +5,7 @@ import selectSoundAudio from "./assets/select.wav";
 import xAssetUrl from "./assets/x.svg";
 import oAssetUrl from "./assets/o.svg";
 
-// simple example for Phaser 
+// simple example for Phaser and Rune combined
 class TicTacToe extends Phaser.Scene {
   boardPosition = { x: window.innerWidth / 20, y: window.innerHeight / 20 };
   cellSize: number = window.innerWidth * 0.3;
@@ -28,6 +28,7 @@ class TicTacToe extends Phaser.Scene {
   }
 
   create() {
+    // create the board lines
     for (let i = 0; i < 2; i++) {
       const verticalLine = this.add.line(
         this.boardPosition.x + this.cellSize + i * this.cellSize,
@@ -68,8 +69,19 @@ class TicTacToe extends Phaser.Scene {
     );
     this.tapToPlayMessage?.setOrigin(0.5, 0.5);
     this.tapToPlayMessage.setVisible(false);
+    this.tweens.add({
+      targets: [this.tapToPlayMessage],
+      ease: "Linear",
+      scaleX: 0.5,
+      scaleY: 0.5,
+      repeat: -1,
+      duration: 500,
+      yoyo: true,
+    });
 
     if (this.input.mouse) {
+      // when the user presses down on a cell we'll send the logic a
+      // request to claim the cell
       this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
         if (this.ourTurn) {
           const cellX = Math.floor(
@@ -83,15 +95,6 @@ class TicTacToe extends Phaser.Scene {
         }
       });
     }
-    this.tweens.add({
-      targets: [this.tapToPlayMessage],
-      ease: "Linear",
-      scaleX: 0.5,
-      scaleY: 0.5,
-      repeat: -1,
-      duration: 500,
-      yoyo: true,
-    });
 
     Rune.initClient({
       onChange: ({ game, yourPlayerId, action, allPlayerIds, event }) => {
@@ -107,6 +110,8 @@ class TicTacToe extends Phaser.Scene {
           this.cellImages = [];
         }
 
+        // work out whose turn it is - either not the last player
+        // or player 0
         this.lastMovePlayerId = lastMovePlayerId ?? allPlayerIds[1];
 
         this.ourTurn = false;
@@ -117,6 +122,8 @@ class TicTacToe extends Phaser.Scene {
           this.ourTurn = true;
         }
 
+        // if we haven't set up the UI for the players then create
+        // images for the players and their associated pieces
         if (!this.addedPlayers) {
           this.addedPlayers = true;
 
@@ -138,6 +145,8 @@ class TicTacToe extends Phaser.Scene {
 
         this.updatePlayerStatus();
 
+        // for any cell that has been set make sure we have an image
+        // for the move on the board
         for (let i = 0; i < 9; i++) {
           if (cells[i] && !this.cellImages[i]) {
             const x = i % 3;
@@ -152,11 +161,17 @@ class TicTacToe extends Phaser.Scene {
             this.cellImages[i] = placed;
           }
         }
+
+        // only show the tap to play message if its our turn and
+        // and no pieces have been played
         if (this.tapToPlayMessage) {
           this.tapToPlayMessage.setVisible(
             this.cellImages.length === 0 && this.ourTurn,
           );
         }
+
+        // play a sound effect each time the logic runs a claimCell
+        // action
         if (action && action.name === "claimCell") {
           this.sound.play("select");
         }
@@ -165,6 +180,7 @@ class TicTacToe extends Phaser.Scene {
   }
 
   updatePlayerStatus(): void {
+    // highlight whose turn it is
     if (this.player1Group && this.player2Group) {
       (this.lastMovePlayerId === this.playerId1
         ? this.player1Group
@@ -178,6 +194,8 @@ class TicTacToe extends Phaser.Scene {
   }
 
   addPlayerImages(): void {
+    // set up the player names, avatars and piece markers
+    // at the bottom of the screen
     const xMarker = this.add.image(
       window.innerWidth * 0.25,
       window.innerHeight * 0.7,
