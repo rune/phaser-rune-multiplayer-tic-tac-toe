@@ -1,20 +1,20 @@
-import type { PlayerId, RuneClient } from "rune-sdk"
+import type { PlayerId, RuneClient } from "rune-sdk";
 
-export type Cells = (PlayerId | null)[]
+export type Cells = (PlayerId | null)[];
 export interface GameState {
-  cells: Cells
-  winCombo: number[] | null
-  lastMovePlayerId: PlayerId | null
-  playerIds: PlayerId[]
-  freeCells?: boolean
+  cells: Cells;
+  winCombo: number[] | null;
+  lastMovePlayerId: PlayerId | null;
+  playerIds: PlayerId[];
+  freeCells?: boolean;
 }
 
 type GameActions = {
-  claimCell: (cellIndex: number) => void
-}
+  claimCell: (cellIndex: number) => void;
+};
 
 declare global {
-  const Rune: RuneClient<GameState, GameActions>
+  const Rune: RuneClient<GameState, GameActions>;
 }
 
 function findWinningCombo(cells: Cells) {
@@ -29,9 +29,9 @@ function findWinningCombo(cells: Cells) {
       [0, 4, 8],
       [2, 4, 6],
     ].find((combo) =>
-      combo.every((i) => cells[i] && cells[i] === cells[combo[0]])
+      combo.every((i) => cells[i] && cells[i] === cells[combo[0]]),
     ) || null
-  )
+  );
 }
 
 Rune.initLogic({
@@ -49,25 +49,25 @@ Rune.initLogic({
         game.cells[cellIndex] !== null ||
         playerId === game.lastMovePlayerId
       ) {
-        throw Rune.invalidAction()
+        throw Rune.invalidAction();
       }
 
-      game.cells[cellIndex] = playerId
-      game.lastMovePlayerId = playerId
-      game.winCombo = findWinningCombo(game.cells)
+      game.cells[cellIndex] = playerId;
+      game.lastMovePlayerId = playerId;
+      game.winCombo = findWinningCombo(game.cells);
 
       if (game.winCombo) {
-        const [player1, player2] = allPlayerIds
+        const [player1, player2] = allPlayerIds;
 
         Rune.gameOver({
           players: {
             [player1]: game.lastMovePlayerId === player1 ? "WON" : "LOST",
             [player2]: game.lastMovePlayerId === player2 ? "WON" : "LOST",
           },
-        })
+        });
       }
 
-      game.freeCells = game.cells.findIndex((cell) => cell === null) !== -1
+      game.freeCells = game.cells.findIndex((cell) => cell === null) !== -1;
 
       if (!game.freeCells) {
         Rune.gameOver({
@@ -75,8 +75,8 @@ Rune.initLogic({
             [game.playerIds[0]]: "LOST",
             [game.playerIds[1]]: "LOST",
           },
-        })
+        });
       }
     },
   },
-})
+});
