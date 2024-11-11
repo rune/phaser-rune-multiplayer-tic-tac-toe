@@ -8,8 +8,6 @@ import oAssetUrl from "./assets/o.svg";
 // for a more complete physics based example check out
 // the Rune Phaser Tech Demo https://developers.rune.ai/blog/phaser/
 
-const sound: HTMLAudioElement = new Audio(selectSoundAudio);
-
 // simple example for Phaser and Rune combined
 class TicTacToe extends Phaser.Scene {
   boardPosition = { x: window.innerWidth / 20, y: window.innerHeight / 20 };
@@ -29,6 +27,7 @@ class TicTacToe extends Phaser.Scene {
   preload() {
     this.load.image("x", xAssetUrl);
     this.load.image("o", oAssetUrl);
+    this.load.audio("select", selectSoundAudio);
   }
 
   create() {
@@ -101,7 +100,8 @@ class TicTacToe extends Phaser.Scene {
     }
 
     Rune.initClient({
-      onChange: ({ game, yourPlayerId, allPlayerIds, event }) => {
+      onChange: ({ game, yourPlayerId, action, allPlayerIds, event }) => {
+        console.log(action, event)
         const { cells, lastMovePlayerId } = game;
 
         // we're starting a new game so reset everything in the UI
@@ -164,7 +164,7 @@ class TicTacToe extends Phaser.Scene {
             placed.setScale((this.cellSize * 0.8) / placed.width);
             this.cellImages[i] = placed;
             // play a sound effect each time a cell is placed
-            sound.play()
+            this.sound.play("select");
           }
         }
 
