@@ -100,8 +100,7 @@ class TicTacToe extends Phaser.Scene {
     }
 
     Rune.initClient({
-      onChange: ({ game, yourPlayerId, action, allPlayerIds, event }) => {
-        console.log(action, event)
+      onChange: ({ game, yourPlayerId, allPlayerIds, event }) => {
         const { cells, lastMovePlayerId } = game;
 
         // we're starting a new game so reset everything in the UI
@@ -268,6 +267,9 @@ const config = {
   width: window.innerWidth,
   height: window.innerHeight,
   backgroundColor: "#333",
+  audio: {
+    disableWebAudio: true,
+  },
   scene: TicTacToe,
 };
 
