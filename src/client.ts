@@ -8,6 +8,8 @@ import oAssetUrl from "./assets/o.svg";
 // for a more complete physics based example check out
 // the Rune Phaser Tech Demo https://developers.rune.ai/blog/phaser/
 
+const sound: HTMLAudioElement = new Audio(selectSoundAudio);
+
 // simple example for Phaser and Rune combined
 class TicTacToe extends Phaser.Scene {
   boardPosition = { x: window.innerWidth / 20, y: window.innerHeight / 20 };
@@ -27,7 +29,6 @@ class TicTacToe extends Phaser.Scene {
   preload() {
     this.load.image("x", xAssetUrl);
     this.load.image("o", oAssetUrl);
-    this.load.audio("select", selectSoundAudio);
   }
 
   create() {
@@ -100,7 +101,7 @@ class TicTacToe extends Phaser.Scene {
     }
 
     Rune.initClient({
-      onChange: ({ game, yourPlayerId, action, allPlayerIds, event }) => {
+      onChange: ({ game, yourPlayerId, allPlayerIds, event }) => {
         const { cells, lastMovePlayerId } = game;
 
         // we're starting a new game so reset everything in the UI
@@ -162,6 +163,8 @@ class TicTacToe extends Phaser.Scene {
             );
             placed.setScale((this.cellSize * 0.8) / placed.width);
             this.cellImages[i] = placed;
+            // play a sound effect each time a cell is placed
+            sound.play()
           }
         }
 
@@ -171,12 +174,6 @@ class TicTacToe extends Phaser.Scene {
           this.tapToPlayMessage.setVisible(
             this.cellImages.length === 0 && this.ourTurn,
           );
-        }
-
-        // play a sound effect each time the logic runs a claimCell
-        // action
-        if (action && action.name === "claimCell") {
-          this.sound.play("select");
         }
       },
     });
@@ -270,6 +267,7 @@ const config = {
   type: Phaser.AUTO,
   width: window.innerWidth,
   height: window.innerHeight,
+  backgroundColor: "#333",
   scene: TicTacToe,
 };
 
